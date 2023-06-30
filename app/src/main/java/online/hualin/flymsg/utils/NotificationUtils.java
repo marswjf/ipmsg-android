@@ -17,6 +17,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import online.hualin.flymsg.App;
+import online.hualin.flymsg.activity.BaseActivity;
 
 public class NotificationUtils {
 
@@ -54,7 +55,11 @@ public class NotificationUtils {
     }
 
     public static void openNotificationSetting() {
-        final Context context = App.getContext();
+        final Context context = BaseActivity.getCurrentActivity();
+        if (context == null) {
+            return;
+        }
+
         AlertDialog alertDialog = new AlertDialog.Builder(context)
                 .setTitle("提示")
                 .setMessage("请在“通知”中打开通知权限")

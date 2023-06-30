@@ -40,8 +40,6 @@
         <ListPreference
             android:defaultValue="/mnt/sdcard/Download"
             android:dialogTitle="下载位置"
-            android:entries="@array/settings_download_preference_titles"
-            android:entryValues="@array/settings_list_preference_values"
             android:icon="@drawable/ic_insert_drive_file_black_24dp"
             android:key="download_pref_list"
             android:negativeButtonText="@null"

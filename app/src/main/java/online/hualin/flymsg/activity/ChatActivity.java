@@ -64,7 +64,6 @@ import online.hualin.flymsg.data.User;
 import online.hualin.flymsg.db.ChatHistory;
 import online.hualin.flymsg.interfaces.ReceiveMsgListener;
 import online.hualin.flymsg.net.NetTcpFileSendThread;
-import online.hualin.flymsg.utils.CommonUtils;
 import online.hualin.flymsg.utils.IpMessageConst;
 import online.hualin.flymsg.utils.IpMessageProtocol;
 import online.hualin.flymsg.utils.UsedConst;
@@ -191,8 +190,7 @@ public class ChatActivity extends BaseActivity implements ReceiveMsgListener
 
         });
         chat_input.setAttachmentsListener(() -> {
-            checkAndRequirePerms(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    , Manifest.permission.READ_EXTERNAL_STORAGE});
+            checkAndRequirePerms(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE});
 
             Intent intent = new Intent(this, FileBrowserActivity.class);
             startActivityForResult(intent, REQUEST_FILE_BROWSER);
@@ -235,7 +233,7 @@ public class ChatActivity extends BaseActivity implements ReceiveMsgListener
             case "File":
                 Intent intent4 = new Intent(this, NormalFilePickActivity.class);
                 intent4.putExtra(Constant.MAX_NUMBER, 9);
-                intent4.putExtra(NormalFilePickActivity.SUFFIX, new String[]{"xlsx", "xls", "doc", "docx", "ppt", "pptx", "pdf"});
+//                intent4.putExtra(NormalFilePickActivity.SUFFIX, new String[]{"xlsx", "xls", "doc", "docx", "ppt", "pptx", "pdf"});
                 startActivityForResult(intent4, Constant.REQUEST_CODE_PICK_FILE);
                 break;
         }
@@ -337,10 +335,8 @@ public class ChatActivity extends BaseActivity implements ReceiveMsgListener
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        checkAndRequirePerms(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE
-                , Manifest.permission.READ_EXTERNAL_STORAGE});
-        if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-                || ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+        checkAndRequirePerms(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE});
+        if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
         {
             return false;
         }
@@ -391,10 +387,8 @@ public class ChatActivity extends BaseActivity implements ReceiveMsgListener
     }
 
     private void openFileManager(String type, int REQUEST_FILE_CODE) {
-        if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-                || ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(ChatActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    , Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMS);
+        if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(ChatActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMS);
         } else {
             Intent intent = new Intent("android.intent.action.GET_CONTENT");
             intent.setType(type + "/*");

@@ -20,6 +20,8 @@ import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -91,9 +93,18 @@ public class MainActivity extends BaseActivity implements OnClickListener
     private Switch aSwitch;
     private String[] tabTitiles = new String[]{"设备", "历史"};
     private int[] pics = {R.drawable.ic_devices_black_24dp, R.drawable.ic_history_white_24dp};
-    private ProgressBar progressBar;
     private PoetryGson poetryGson;
     private String poetryText;
+
+    private ActivityResultLauncher<String[]> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), grants -> {
+                for (Map.Entry<String, Boolean> entry : grants.entrySet()) {
+                    if (!entry.getValue()) {
+                        Toasty.error(this, "权限申请失败，部分功能可能受影响").show();
+                    }
+                }
+            });
+
     private ViewPager.OnPageChangeListener pageChangeListener = new ViewPager.OnPageChangeListener() {
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -132,7 +143,6 @@ public class MainActivity extends BaseActivity implements OnClickListener
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        EventBus.getDefault().register(this);
         StatusBarUtil.setTranslucent(this);
 
         if (!NotificationUtils.isNotificationEnabled(getApplicationContext())) {
@@ -142,58 +152,17 @@ public class MainActivity extends BaseActivity implements OnClickListener
 
         boolean isFirstLogin = pref.getBoolean("FirstUse", true);
         if (isFirstLogin) {
-            new AlertDialog.Builder(this)
-                    .setTitle("服务条款")
-                    .setMessage(R.string.service_policy)
-                    .setNegativeButton("拒绝",(dialog,which)->{
-                        finish();
-                    })
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            checkedFirst();
-                            checkAndRequirePerms(new String[]{Manifest.permission_group.STORAGE});
-                            dialog.cancel();
-                        }
-                    }).create().show();
-
-            new AlertDialog.Builder(this)
-                    .setTitle("隐私政策")
-                    .setMessage(R.string.private_policy)
-                    .setNegativeButton("拒绝",(dialog,which)->{
-                        finish();
-                    })
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    }).create().show();
-
-
+            checkedFirst();
         }
-
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-//                || ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-//        {
-//            checkAndRequirePerms(new String[]{Manifest.permission_group.STORAGE});
-//        }
-
+        checkAndRequirePerms();
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-
-//        if (!isWifiActive()) {    //若wifi没有打开，提示
-//            Snackbar.make(getWindow().getDecorView(), "没有WiFi连接", Snackbar.LENGTH_LONG)
-//                    .setAction("OK", v -> {
-//                    }).show();
-//        }
 
         iniNet();
         initView();
         initNav();
         initTab();
-
     }
 
     private void checkedFirst(){
@@ -210,26 +179,19 @@ public class MainActivity extends BaseActivity implements OnClickListener
         this.poetryGson=poetryGson;
     }
 
-    public void checkAndRequirePerms(String[] permList) {
-        for (String perm : permList) {
-            if (ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{perm}, REQUEST_PERMS);
-            }
-        }
-    }
+    public void checkAndRequirePerms() {
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_PERMS:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toasty.error(getApplicationContext(), "已打开权限", Toasty.LENGTH_SHORT).show();
-                } else {
-                    Toasty.error(getApplicationContext(), "为正常使用你需要打开必须的权限", Toasty.LENGTH_SHORT).show();
-//                    finish();
-                }
-                break;
-            default:
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                Snackbar.make(findViewById(R.id.drawer_layout), "需要读写权限才能正常使用", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("确定", v -> {
+                            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMS);
+                        }).show();
+            } else {
+                requestPermissionLauncher.launch(new String[] {
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                });
+            }
         }
     }
 

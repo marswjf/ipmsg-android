@@ -18,10 +18,23 @@ Flymsg(飞笺)是一个类飞鸽传书的局域网传输软件,具有即时通�
 <img src="./screenshot/his.jpg" width="250" height="500">
 <img src="./screenshot/setting.jpg" width="250" height="500">
 
-## 作者
+## 原作者
 lithiumice (LiangHuaLin) \
 2729020028 (QQ) \
-https://hualin.online (blog)
+https://hualin.online (blog)\
+
+cfgxy (cfgxy@qq.com)\
+
+## 改动记录
+
+*2023/06/30:*
+
+- 升级到 AGP:7.4.1, Gradle:7.6, BuildTool:v34; 
+- 更新依赖库，更新Android权限申请机制
+- AndroidStudio 2022.2.1 编译通过
+- Android 13 下可正常运行
+- 修复文件收发功能 (Win10 + [IPMsgv4.99](https://github.com/shirouzu/ipmsg) 测试OK)
+
 
 ## 协议
 
@@ -42,3 +55,8 @@ https://hualin.online (blog)
 >This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 >You should have received a copy of the GNU General Public License along with this app. If not, see <https://www.gnu.org/licenses/>.
+
+
+## 相关资料
+
+- [IP Messenger 协议中文版 (草案版本 10）](https://github.com/admirestator/oipmsg/blob/master/doc/protocol_zh.txt)

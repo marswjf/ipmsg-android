@@ -20,6 +20,7 @@ import java.util.concurrent.Executor;
 
 //import online.hualin.flymsg.injector.component.AppComponent;
 //import online.hualin.flymsg.injector.module.ApiModule;
+import online.hualin.flymsg.activity.BaseActivity;
 import online.hualin.flymsg.injector.module.AppModule;
 import online.hualin.flymsg.injector.module.SharedPreferencesModule;
 import online.hualin.flymsg.loadsir.callback.EmptyCallback;
@@ -38,6 +39,8 @@ public class App extends Application {
     private AppModule appModule;
     private static SharedPreferences pref;
     private static SharedPreferences.Editor editor;
+
+    private Handler handler;
 
     public static Context getContext() {
         return context;
@@ -65,6 +68,7 @@ public class App extends Application {
         Database db = helper.getWritableDb();
         daoSession = new DaoMaster(db).newSession();
 
+        registerActivityLifecycleCallbacks(BaseActivity.lifeCycleCallbacks);
 //        LoadSir.beginBuilder()
 //                .addCallback(new EmptyCallback())
 //                .addCallback(new LoadingCallback())

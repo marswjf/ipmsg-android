@@ -14,6 +14,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -52,15 +55,13 @@ public class NetTcpFileReceiveThread implements Runnable {
 
         selfName = App.getDeviceName();
         selfGroup = App.getGroupName();
-        String savePathString=App.getPref().getString("download_pref_list","/mnt/sdcard/Download");
+        String savePathString=App.getPref().getString(
+                "download_pref_list",
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath()
+        );
         savePath=new File(savePathString);
 
-//        savePath = Environment.getExternalStorageDirectory().getAbsoluteFile();
-
-        Log.d(TAG, "SavePath:" + savePath);
-//		savePath=App.getContext().getExternalFilesDir("file");
-
-        saveDir = new File(savePath, "Download");
+        saveDir = savePath;
         if (!saveDir.exists()) {
             saveDir.mkdirs();
         }
@@ -80,7 +81,7 @@ public class NetTcpFileReceiveThread implements Runnable {
             ipmsgPro.setCommandNo(IpMessageConst.IPMSG_GETFILEDATA);
             ipmsgPro.setSenderName(selfName);
             ipmsgPro.setSenderHost(selfGroup);
-            String additionStr = Long.toHexString(packetNo) + ":" + i + ":" + "0:";
+            String additionStr = Long.toHexString(packetNo) + ":" + Long.toHexString(Long.parseLong(fileInfo[0])) + ":" + "0:";
             ipmsgPro.setAdditionalSection(additionStr);
 
 
@@ -92,6 +93,7 @@ public class NetTcpFileReceiveThread implements Runnable {
                 //发送收取文件飞鸽命令
                 byte[] sendBytes = ipmsgPro.getProtocolString().getBytes("gbk");
                 bos.write(sendBytes, 0, sendBytes.length);
+                bos.write(new byte[] {0x00});   // 结束符
                 bos.flush();
 
                 Log.d(TAG, "通过TCP发送接收指定文件命令。命令内容是：" + ipmsgPro.getProtocolString());

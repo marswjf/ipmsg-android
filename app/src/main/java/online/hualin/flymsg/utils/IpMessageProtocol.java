@@ -125,7 +125,7 @@ public class IpMessageProtocol {
 	//得到数据包编号，毫秒数
 	private String getSeconds(){
 		Date nowDate = new Date();
-		return Long.toString(nowDate.getTime());
+		return Long.toString(nowDate.getTime() / 1000);
 	}
 
 }

@@ -1,8 +1,11 @@
 package online.hualin.flymsg.fragment;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
@@ -16,6 +19,7 @@ import online.hualin.flymsg.R;
 import online.hualin.flymsg.View.ThemeChoiceFragment;
 import online.hualin.flymsg.View.ThemeChoicePreference;
 import online.hualin.flymsg.activity.SettingsActivity;
+import online.hualin.flymsg.utils.CommonUtils;
 
 public class SettingFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceChangeListener ,SharedPreferences.OnSharedPreferenceChangeListener{
     private final int REQUEST_CODE_ALERT_RINGTONE = 1;
@@ -28,7 +32,6 @@ public class SettingFragment extends PreferenceFragmentCompat implements Prefere
         addPreferencesFromResource(R.xml.root_preferences);
         sp = android.preference.PreferenceManager.getDefaultSharedPreferences(getActivity());
         theme = sp.getInt("theme_change", R.style.Theme7);
-
     }
 
     @Override
@@ -45,15 +48,25 @@ public class SettingFragment extends PreferenceFragmentCompat implements Prefere
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String defaultStorage = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+        String[] dirList = new String[]{
+                defaultStorage,
+                ContextCompat.getExternalFilesDirs(this.getActivity(), "Download")[0].getAbsolutePath(),
+        };
+
+        ListPreference storageList = findPreference("download_pref_list");
+        storageList.setEntries(dirList);
+        storageList.setEntryValues(dirList);
+
+        storageList.setOnPreferenceChangeListener(this);
         findPreference("switch_notify").setOnPreferenceChangeListener(this);
         findPreference("AutoReceive").setOnPreferenceChangeListener(this);
-        findPreference("download_pref_list").setOnPreferenceChangeListener(this);
         findPreference("theme_change").setOnPreferenceChangeListener(this);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(App.getContext());
         onPreferenceChange(findPreference("switch_notify"), preferences.getBoolean("switch_notify", true));
         onPreferenceChange(findPreference("AutoReceive"), preferences.getBoolean("AutoReceive", true));
-        onPreferenceChange(findPreference("download_pref_list"), preferences.getString("download_pref_list", "/mnt/sdcard/Download"));
+        onPreferenceChange(findPreference("download_pref_list"), preferences.getString("download_pref_list", defaultStorage));
     }
 
     @Override
